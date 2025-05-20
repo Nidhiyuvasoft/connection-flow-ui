@@ -1,14 +1,16 @@
+
 'use client';
 
-import { useRef, useState } from 'react';
-import { IoClose } from "react-icons/io5"; // <-- Import the close icon
+import { useEffect, useRef, useState } from 'react';
+import { IoClose } from "react-icons/io5";
 
-export default function OtpModal({ platformName, onClose }) {
+export default function OtpModal({ platformName, onClose, platformLogo }) {
   const inputRefs = useRef([]);
   const [otp, setOtp] = useState(new Array(6).fill(''));
   const [isVerifying, setIsVerifying] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [expandedItem, setExpandedItem] = useState(null);
+  const [showLeagueInfo, setShowLeagueInfo] = useState(false); // NEW STATE
 
   const checklistItems = [
     'Connecting to platform',
@@ -37,7 +39,7 @@ export default function OtpModal({ platformName, onClose }) {
       } else {
         setTimeout(() => {
           setIsVerifying(true);
-        }, 300);
+        }, 3000);
       }
     } else {
       e.target.value = '';
@@ -53,14 +55,21 @@ export default function OtpModal({ platformName, onClose }) {
   };
 
   const toggleItem = (item) => {
+    const isSelected = selectedItems.includes(item);
     setSelectedItems((prev) =>
-      prev.includes(item)
-        ? prev.filter((i) => i !== item)
-        : [...prev, item]
+      isSelected ? prev.filter((i) => i !== item) : [...prev, item]
     );
 
     if (item === 'Finding Active Slates') {
-      setExpandedItem((prev) => (prev === item ? null : item));
+      if (!isSelected) {
+        // Expand and show info after delay
+        setExpandedItem(item);
+        setShowLeagueInfo(false); // reset
+        setTimeout(() => setShowLeagueInfo(true), 500);
+      } else {
+        setExpandedItem(null);
+        setShowLeagueInfo(false);
+      }
     }
   };
 
@@ -68,7 +77,13 @@ export default function OtpModal({ platformName, onClose }) {
     return (
       <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-[#1b1b1b] text-white p-6 rounded-xl relative space-y-4">
-          <h2 className="text-lg font-semibold">Downloading data</h2>
+          {/* Header with platform logo */}
+          <div className="flex items-center mb-4 space-x-2">
+            {platformLogo && (
+              <img src={platformLogo} alt={`${platformName} logo`} className="w-6 h-6" />
+            )}
+            <h2 className="text-xl font-semibold">Downloading data</h2>
+          </div>
 
           {checklistItems.map((item, index) => (
             <div key={index}>
@@ -80,63 +95,58 @@ export default function OtpModal({ platformName, onClose }) {
                     : 'bg-[#1a1a1a] text-gray-500'
                 }`}
               >
-                <span>{item}</span>
+                <div className="flex flex-col">
+                  <span>{item}</span>
+                  {/* Delayed display of "4 leagues found" */}
+                  {item === 'Finding Active Slates' &&
+                    selectedItems.includes(item) &&
+                    showLeagueInfo && (
+                      <span className="text-sm text-gray-400">
+                        {leagues.length} leagues found
+                      </span>
+                    )}
+                </div>
                 <span className="text-xl">
                   {selectedItems.includes(item) ? '✔' : ''}
                 </span>
               </div>
 
-              {item === 'Finding Active Slates' && expandedItem === item && (
-                <div className="mt-2 ml-4 bg-[#101010] rounded-md p-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-white text-sm font-medium">Loading Leagues</p>
-                    <div className="relative group ml-2">
-                      <p className="text-xs text-blue-400 underline cursor-pointer">
-                        Michael Chiang
-                      </p>
-                      <div className="absolute left-0 mt-2 hidden group-hover:block z-50 bg-[#2a2a2a] text-white text-xs p-3 rounded-md shadow-lg w-72">
-                        <p className="font-semibold">
-                          Michael Chiang{' '}
-                          <span className="text-gray-400 font-normal">9 hr. ago</span>
-                        </p>
-                        <p className="mt-1 text-gray-300 leading-snug">
-                          Until the sync gets to this section it should just be 'Loading
-                          Leagues' with no sub divs like the others
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {leagues.map((league) => (
-                    <div
-                      key={league.name}
-                      className="flex justify-between items-center border-b border-gray-700 py-2"
-                    >
-                      <div>
-                        <p
-                          className={`text-sm ${
-                            league.status === 'done'
-                              ? 'text-green-400'
-                              : 'text-white'
-                          }`}
-                        >
-                          {league.name}
-                        </p>
-                        {league.status === 'loading' && (
-                          <p className="text-xs text-gray-400">
-                            {league.progress}% • {league.timeLeft} left
+              {/* Delayed expansion of league list */}
+              {item === 'Finding Active Slates' &&
+                expandedItem === item &&
+                showLeagueInfo && (
+                  <div className="mt-2 ml-4 bg-[#101010] rounded-md p-3 space-y-2">
+                    {leagues.map((league) => (
+                      <div
+                        key={league.name}
+                        className="flex justify-between items-center border-b border-gray-700 py-2"
+                      >
+                        <div>
+                          <p
+                            className={`text-sm ${
+                              league.status === 'done'
+                                ? 'text-green-400'
+                                : 'text-white'
+                            }`}
+                          >
+                            {league.name}
                           </p>
-                        )}
+                          {league.status === 'loading' && (
+                            <p className="text-xs text-gray-400">
+                              {league.progress}% • {league.timeLeft} left
+                            </p>
+                          )}
+                        </div>
+                        {league.status === 'done' ? (
+                          <span className="text-green-400 text-sm">✔</span>
+                        ) : league.status === 'loading' ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          
+                        ) : null}
                       </div>
-                      {league.status === 'done' ? (
-                        <span className="text-green-400 text-sm">✔</span>
-                      ) : league.status === 'loading' ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
             </div>
           ))}
         </div>
@@ -144,81 +154,49 @@ export default function OtpModal({ platformName, onClose }) {
     );
   }
 
-  // return (
-  //   <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-  //     <div className="w-full max-w-md bg-[#1b1b1b] text-white p-6 rounded-xl relative">
-        
-  //       <h2 className="text-xl font-semibold mb-2 flex items-center">
-  //         Connecting {platformName}
-  //       </h2>
-  //       <p className="mb-4 text-gray-400 text-sm">
-  //         Enter a 6-digit code sent to email@address.com
-  //       </p>
+  // OTP modal (initial screen)
+  return (
+    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-[#1b1b1b] text-white p-6 rounded-xl relative">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"
+          aria-label="Close"
+        >
+          <IoClose />
+        </button>
 
-  //       <div className="flex justify-between gap-2">
-  //         {otp.map((digit, i) => (
-  //           <input
-  //             key={i}
-  //             ref={(el) => (inputRefs.current[i] = el)}
-  //             type="text"
-  //             maxLength={1}
-  //             inputMode="numeric"
-  //             pattern="[0-9]*"
-  //             className="w-10 h-12 text-center text-xl rounded bg-black border border-gray-600 focus:outline-none"
-  //             value={digit}
-  //             onChange={(e) => handleChange(e, i)}
-  //             onKeyDown={(e) => handleKeyDown(e, i)}
-  //           />
-  //         ))}
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
+        {/* Header */}
+        <div className="flex items-center mb-4 space-x-2">
+          {platformLogo && (
+            <img src={platformLogo} alt={`${platformName} logo`} className="w-6 h-6" />
+          )}
+          <h2 className="text-xl font-semibold">Connecting {platformName}</h2>
+        </div>
 
-  
+        <p className="mb-4 text-gray-400 text-sm">
+          Enter a 6-digit code sent to email@address.com
+        </p>
 
-return (
-  <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-    <div className="w-full max-w-md bg-[#1b1b1b] text-white p-6 rounded-xl relative">
-
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"
-        aria-label="Close"
-      >
-        <IoClose />
-      </button>
-
-      <h2 className="text-xl font-semibold mb-2 flex items-center">
-        Connecting {platformName}
-      </h2>
-      <p className="mb-4 text-gray-400 text-sm">
-        Enter a 6-digit code sent to email@address.com
-      </p>
-
-      <div className="flex justify-between gap-2">
-        {otp.map((digit, i) => (
-          <input
-            key={i}
-            ref={(el) => (inputRefs.current[i] = el)}
-            type="text"
-            maxLength={1}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            className="w-10 h-12 text-center text-xl rounded bg-black border border-gray-600 focus:outline-none"
-            value={digit}
-            onChange={(e) => handleChange(e, i)}
-            onKeyDown={(e) => handleKeyDown(e, i)}
-          />
-        ))}
+        {/* OTP Input */}
+        <div className="flex justify-between gap-2">
+          {otp.map((digit, i) => (
+            <input
+              key={i}
+              ref={(el) => (inputRefs.current[i] = el)}
+              type="text"
+              maxLength={1}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              className="w-10 h-12 text-center text-xl rounded bg-black border border-gray-600 focus:outline-none"
+              value={digit}
+              onChange={(e) => handleChange(e, i)}
+              onKeyDown={(e) => handleKeyDown(e, i)}
+            />
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 }
-
-
-
-

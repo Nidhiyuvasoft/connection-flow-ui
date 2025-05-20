@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
 
-export default function SignInModal({ platformName, onClose, onSuccess }) {
+
+
+export default function SignInModal({ platformName, onClose, onSuccess,platformLogo }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -15,17 +17,13 @@ export default function SignInModal({ platformName, onClose, onSuccess }) {
         >
           <IoClose />
         </button>
-
-        <h2 className="text-xl font-bold mb-4 text-center">
-          Connecting {platformName}
-        </h2>
-        {/* <input
-          type="text"
-          placeholder="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 mb-3 rounded bg-gray-800 text-white"
-        />  */}
+        <div className="flex items-center justify-center mb-6 space-x-2">
+         {platformLogo && (
+            <img src={platformLogo} alt={`${platformName} logo`} className="w-6 h-6" />
+          )}
+         <h2 className="text-xl font-bold">Connecting {platformName}</h2>
+        </div>
+        
         <div className="relative mb-6 ">
           <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
             <img src="/assets/email-icon.svg" alt="email-icon" />
@@ -36,13 +34,6 @@ export default function SignInModal({ platformName, onClose, onSuccess }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)} />
         </div>
-        {/* <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 mb-4 rounded bg-gray-800 text-white"
-        /> */}
         <div className="relative mb-6 ">
           <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
             <img src="/assets/lock-icon.svg" alt="email-icon" sizes="16px" />

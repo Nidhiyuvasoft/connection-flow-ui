@@ -24,15 +24,3 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-
-@font-face {
-    font-family: 'tactic_sansmedium_italic';
-    src: url('/public/assets/tacticsans-medit.woff') format('woff2'),
-         url('/public/assets/tacticsans-medit.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-
-}
-h1 {
-   font-family: 'tactic_sansmedium_italic';
-}
