@@ -39,7 +39,7 @@ export default function ConnectPage() {
   };
 
   const handleSignInSuccess = () => {
-    // switch to OTP modal
+   
     setStage('otp');
   };
 
@@ -78,7 +78,7 @@ export default function ConnectPage() {
         </div>
       )}
 
-      {/* Show SignInModal in place of page */}
+     
       {showModal && stage === 'signin' && (
 
         <SignInModal
@@ -89,10 +89,10 @@ export default function ConnectPage() {
         />
       )}
 
-      {/* Show OtpModal in place of page */}
+      
       {showModal && stage === 'otp' && (
         <OtpModal
-          // platformName={activePlatform}
+          
           platformName={platforms.find(p => p.id === activePlatform)?.name}
           platformLogo={platforms.find(p => p.id === activePlatform)?.logo}
           onClose={handleClose}

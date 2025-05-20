@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -10,7 +9,9 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
   const [isVerifying, setIsVerifying] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [expandedItem, setExpandedItem] = useState(null);
-  const [showLeagueInfo, setShowLeagueInfo] = useState(false); // NEW STATE
+  const [showLeagueInfo, setShowLeagueInfo] = useState(false);
+  const [leagueStatusList, setLeagueStatusList] = useState([]);
+  const [currentLeagueIndex, setCurrentLeagueIndex] = useState(0);
 
   const checklistItems = [
     'Connecting to platform',
@@ -19,11 +20,11 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
     'Calculating Exposures / Data',
   ];
 
-  const leagues = [
-    { name: 'League Delta', status: 'done' },
-    { name: 'League Alpha', status: 'loading', progress: 64, timeLeft: '15s' },
-    { name: 'League Gamma', status: 'pending' },
-    { name: 'League Beta', status: 'pending' },
+  const defaultLeagues = [
+    { name: 'League Delta' },
+    { name: 'League Alpha' },
+    { name: 'League Gamma' },
+    { name: 'League Beta' },
   ];
 
   const handleChange = (e, index) => {
@@ -37,22 +38,14 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
       if (index < 5) {
         inputRefs.current[index + 1]?.focus();
       } else {
-        setTimeout(() => {
-          setIsVerifying(true);
-        }, 3000);
+        
+        setIsVerifying(true);
       }
     } else {
       e.target.value = '';
     }
   };
 
-  const handleKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && otp[index] === '') {
-      if (index > 0) {
-        inputRefs.current[index - 1]?.focus();
-      }
-    }
-  };
 
   const toggleItem = (item) => {
     const isSelected = selectedItems.includes(item);
@@ -62,22 +55,41 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
 
     if (item === 'Finding Active Slates') {
       if (!isSelected) {
-        // Expand and show info after delay
         setExpandedItem(item);
-        setShowLeagueInfo(false); // reset
-        setTimeout(() => setShowLeagueInfo(true), 500);
+        setShowLeagueInfo(false);
+        setLeagueStatusList([]);
+        setCurrentLeagueIndex(0);
+        setTimeout(() => {
+          setShowLeagueInfo(true);
+        }, 3000);
       } else {
         setExpandedItem(null);
         setShowLeagueInfo(false);
+        setLeagueStatusList([]);
+        setCurrentLeagueIndex(0);
       }
     }
   };
+
+  useEffect(() => {
+    if (!showLeagueInfo || currentLeagueIndex >= defaultLeagues.length) return;
+
+    const timer = setTimeout(() => {
+      setLeagueStatusList((prev) => [
+        ...prev,
+        { name: defaultLeagues[currentLeagueIndex].name, status: 'done' },
+      ]);
+      setCurrentLeagueIndex((prev) => prev + 1);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [currentLeagueIndex, showLeagueInfo]);
 
   if (isVerifying) {
     return (
       <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-[#1b1b1b] text-white p-6 rounded-xl relative space-y-4">
-          {/* Header with platform logo */}
+         
           <div className="flex items-center mb-4 space-x-2">
             {platformLogo && (
               <img src={platformLogo} alt={`${platformName} logo`} className="w-6 h-6" />
@@ -97,12 +109,11 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
               >
                 <div className="flex flex-col">
                   <span>{item}</span>
-                  {/* Delayed display of "4 leagues found" */}
                   {item === 'Finding Active Slates' &&
                     selectedItems.includes(item) &&
                     showLeagueInfo && (
                       <span className="text-sm text-gray-400">
-                        {leagues.length} leagues found
+                        {defaultLeagues.length} leagues found
                       </span>
                     )}
                 </div>
@@ -111,40 +122,32 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
                 </span>
               </div>
 
-              {/* Delayed expansion of league list */}
               {item === 'Finding Active Slates' &&
                 expandedItem === item &&
                 showLeagueInfo && (
                   <div className="mt-2 ml-4 bg-[#101010] rounded-md p-3 space-y-2">
-                    {leagues.map((league) => (
-                      <div
-                        key={league.name}
-                        className="flex justify-between items-center border-b border-gray-700 py-2"
-                      >
-                        <div>
-                          <p
-                            className={`text-sm ${
-                              league.status === 'done'
-                                ? 'text-green-400'
-                                : 'text-white'
-                            }`}
-                          >
-                            {league.name}
-                          </p>
-                          {league.status === 'loading' && (
-                            <p className="text-xs text-gray-400">
-                              {league.progress}% • {league.timeLeft} left
+                    {defaultLeagues.map((league, index) => {
+                      const isLoaded = leagueStatusList.some((l) => l.name === league.name);
+                      const isCurrentLoading = index === currentLeagueIndex;
+
+                      return (
+                        <div
+                          key={league.name}
+                          className="flex justify-between items-center border-b border-gray-700 py-2"
+                        >
+                          <div>
+                            <p className={`text-sm ${isLoaded ? 'text-green-400' : 'text-white'}`}>
+                              {league.name}
                             </p>
-                          )}
+                          </div>
+                          {isLoaded ? (
+                            <span className="text-green-400 text-sm">✔</span>
+                          ) : isCurrentLoading ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : null}
                         </div>
-                        {league.status === 'done' ? (
-                          <span className="text-green-400 text-sm">✔</span>
-                        ) : league.status === 'loading' ? (
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          
-                        ) : null}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
             </div>
@@ -154,11 +157,11 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
     );
   }
 
-  // OTP modal (initial screen)
+  
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-[#1b1b1b] text-white p-6 rounded-xl relative">
-        {/* Close button */}
+       
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"
@@ -167,7 +170,7 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
           <IoClose />
         </button>
 
-        {/* Header */}
+       
         <div className="flex items-center mb-4 space-x-2">
           {platformLogo && (
             <img src={platformLogo} alt={`${platformName} logo`} className="w-6 h-6" />
@@ -179,7 +182,7 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
           Enter a 6-digit code sent to email@address.com
         </p>
 
-        {/* OTP Input */}
+       
         <div className="flex justify-between gap-2">
           {otp.map((digit, i) => (
             <input
@@ -192,7 +195,6 @@ export default function OtpModal({ platformName, onClose, platformLogo }) {
               className="w-10 h-12 text-center text-xl rounded bg-black border border-gray-600 focus:outline-none"
               value={digit}
               onChange={(e) => handleChange(e, i)}
-              onKeyDown={(e) => handleKeyDown(e, i)}
             />
           ))}
         </div>
