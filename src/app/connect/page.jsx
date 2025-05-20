@@ -5,11 +5,11 @@ import SignInModal from './signInModal';
 import OtpModal from './OtpModal';
 
 const platforms = [
-  { id: 'sleeper', name: 'Sleeper', logo: '/logos/sleeper.png' },
-  { id: 'espn', name: 'ESPN', logo: '/logos/espn.png', note: '2FA required' },
-  { id: 'yahoo', name: 'Yahoo', logo: '/logos/yahoo.png' },
-  { id: 'cbs', name: 'CBS', logo: '/logos/cbs.png' },
-  { id: 'nfl', name: 'NFL.com', logo: '/logos/nfl.png' },
+  { id: 'sleeper', name: 'Sleeper', logo: '/assets/icon-1.png' },
+  { id: 'espn', name: 'ESPN', logo: '/assets/icon-2.png', note: '2FA required' },
+  { id: 'yahoo', name: 'Yahoo', logo: '/assets/icon-3.png' },
+  { id: 'cbs', name: 'CBS', logo: '/assets/icon-4.png' },
+  { id: 'nfl', name: 'NFL.com', logo:'/assets/icon-5.png' },
 ];
 
 export default function ConnectPage() {
@@ -45,17 +45,16 @@ export default function ConnectPage() {
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      {/* Show Connect Page only when no modal is visible */}
       {!showModal && (
-        <div className="w-full max-w-2xl p-6">
-          <h1 className="text-2xl font-bold text-center mb-2">
+        <div className="w-full  p-6 max-w-[380px]">
+          <h1 className="text-3xl font-bold text-center mb-2 text-[#FFFFF6]">
             Select platforms to connect to Stacked
           </h1>
-          <p className="text-sm text-center text-gray-400 mb-6">
+          <p className="text-base text-center text-[#9D9D95] mb-6 font-normal">
             Connect tools to manage your Leagues. Add at least one now, you can always add more later.
           </p>
 
-          <div className="bg-[#111] rounded-xl p-6 space-y-4">
+          <div className=" rounded-md  space-y-3">
             {platforms.map((platform) => (
               <PlatformTile
                 key={platform.id}
@@ -69,10 +68,10 @@ export default function ConnectPage() {
           <button
             onClick={handleContinue}
             disabled={selected.length === 0}
-            className={`w-full mt-6 py-3 font-semibold rounded transition ${
+            className={`w-full mt-6 py-3 font-regular text-[#030303] text-base bg-lime-400 rounded-sm transition ${
               selected.length === 0
                 ? 'bg-gray-700 cursor-not-allowed'
-                : 'bg-lime-400 text-black hover:bg-lime-500'
+                : 'bg-lime-400 text-[#030303] hover:bg-lime-500'
             }`}
           >
             Continue
