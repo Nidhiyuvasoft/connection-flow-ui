@@ -1,8 +1,7 @@
 'use client';
-import { useState } from 'react';
 import PlatformTile from '@/components/PlatformTile';
-import SignInModal from './signInModal';
-import OtpModal from './OtpModal';
+import { useState } from 'react';
+import ConnectModal from './ConnectModal';
 
 const platforms = [
   { id: 'sleeper', name: 'Sleeper', logo: '/assets/icon-1.png' },
@@ -78,26 +77,15 @@ export default function ConnectPage() {
         </div>
       )}
 
-     
-      {showModal && stage === 'signin' && (
-
-        <SignInModal
-          platformName={platforms.find(p => p.id === activePlatform)?.name}
-          platformLogo={platforms.find(p => p.id === activePlatform)?.logo}
-          onClose={handleClose}
-          onSuccess={handleSignInSuccess}
-        />
-      )}
-
-      
-      {showModal && stage === 'otp' && (
-        <OtpModal
-          
-          platformName={platforms.find(p => p.id === activePlatform)?.name}
-          platformLogo={platforms.find(p => p.id === activePlatform)?.logo}
-          onClose={handleClose}
-        />
-      )}
+{showModal && (
+  <ConnectModal
+    stage={stage}
+    platformName={platforms.find(p => p.id === activePlatform)?.name || ''}
+    platformLogo={platforms.find(p => p.id === activePlatform)?.logo || ''}
+    onClose={handleClose}
+    onSignInSuccess={handleSignInSuccess}
+  />
+)}
     </div>
   );
 }
