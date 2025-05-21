@@ -1,15 +1,14 @@
 'use client';
-import { useState } from 'react';
 import PlatformTile from '@/components/PlatformTile';
-import SignInModal from './signInModal';
-import OtpModal from './OtpModal';
+import { useState } from 'react';
+import ConnectModal from './ConnectModal';
 
 const platforms = [
   { id: 'sleeper', name: 'Sleeper', logo: '/assets/icon-1.png' },
   { id: 'espn', name: 'ESPN', logo: '/assets/icon-2.png', note: '2FA required' },
   { id: 'yahoo', name: 'Yahoo', logo: '/assets/icon-3.png' },
   { id: 'cbs', name: 'CBS', logo: '/assets/icon-4.png' },
-  { id: 'nfl', name: 'NFL.com', logo:'/assets/icon-5.png' },
+  { id: 'nfl', name: 'NFL.com', logo: '/assets/icon-5.png' },
 ];
 
 export default function ConnectPage() {
@@ -39,7 +38,7 @@ export default function ConnectPage() {
   };
 
   const handleSignInSuccess = () => {
-    // switch to OTP modal
+
     setStage('otp');
   };
 
@@ -68,31 +67,23 @@ export default function ConnectPage() {
           <button
             onClick={handleContinue}
             disabled={selected.length === 0}
-            className={`w-full mt-[40px] py-3 font-regular text-[#030303] text-base bg-lime-400 rounded-sm transition ${
-              selected.length === 0
+            className={`w-full mt-[40px] py-3 font-regular text-[#030303] text-base bg-lime-400 rounded-sm transition ${selected.length === 0
                 ? 'bg-gray-700 cursor-not-allowed'
                 : 'bg-lime-400 text-[#030303] hover:bg-lime-500'
-            }`}
+              }`}
           >
             Continue
           </button>
         </div>
       )}
 
-      {/* Show SignInModal in place of page */}
-      {showModal && stage === 'signin' && (
-        <SignInModal
-          platformName={activePlatform}
+      {showModal && (
+        <ConnectModal
+          stage={stage}
+          platformName={platforms.find(p => p.id === activePlatform)?.name || ''}
+          platformLogo={platforms.find(p => p.id === activePlatform)?.logo || ''}
           onClose={handleClose}
-          onSuccess={handleSignInSuccess}
-        />
-      )}
-
-      {/* Show OtpModal in place of page */}
-      {showModal && stage === 'otp' && (
-        <OtpModal
-          platformName={activePlatform}
-          onClose={handleClose}
+          onSignInSuccess={handleSignInSuccess}
         />
       )}
     </div>
