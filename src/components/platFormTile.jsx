@@ -5,7 +5,7 @@ export default function PlatformTile({ platform, selected, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="cursor-pointer w-full bg-[#1b1b1b] p-[24px] rounded-lg flex items-center justify-between hover:bg-[#2c2c2c] transition"
+      className="cursor-pointer w-full bg-[#141414] p-[24px] rounded-lg flex items-center justify-between hover:bg-[#2c2c2c] transition"
     >
       <div className="flex items-center gap-4">
         <Image src={platform.logo} alt={platform.name} width={32} height={32} />
@@ -18,7 +18,7 @@ export default function PlatformTile({ platform, selected, onClick }) {
       <div>
         {selected ? (
           <div className="w-7 h-7 flex items-center justify-center bg-white/10 rounded-sm">
-            {/* <img className='w-4 h-4 ' src="/assets/checkmark-2.svg" alt="checkmark icon" /> */}
+            <Image className='w-4 h-4'  src={checkmark } alt="not-found"/>
           </div>
         ) : (
           <div className="w-7 h-7 flex items-center justify-center bg-white/10 rounded-sm " >

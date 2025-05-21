@@ -2,7 +2,10 @@
 
 import { useRef, useState } from 'react';
 import { IoClose } from "react-icons/io5"; // <-- Import the close icon
-import {underdog} from "@/assets/images/underdog.png"
+// import {underdog} from "../../assets/images/underdog.png"
+import clippath from "../../assets/images/clip-path-group.svg"
+import checkmark from "../../assets/images/checkmark-2.svg"
+import Image from 'next/image';
 
 export default function OtpModal({ platformName, onClose }) {
   const inputRefs = useRef([]);
@@ -67,52 +70,40 @@ export default function OtpModal({ platformName, onClose }) {
 
   if (isVerifying) {
     return (
-      <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className="w-full max-w-[480px] bg-[#1b1b1b] text-white p-[32px] rounded-[6px] relative space-y-4">
-          <img src={underdog} alt='underdog' />
-          <h2 className="text-lg font-semibold mb-[32px]">Downloading data</h2>
-
+      <div className="fixed inset-0 z-50 overlay-box flex items-center justify-center p-4">
+        <div className="w-full max-w-[480px] bg-[#030303] text-white p-[32px] rounded-[6px] relative space-y-4">
+          <div className='flex gap-3 mb-[32px]'>
+            <Image src={clippath} alt='underdog' />
+            <h2 className="text-lg font-semibold m-0">Downloading data</h2>
+          </div>
           {checklistItems.map((item, index) => (
             <div key={index}>
               <div
                 onClick={() => toggleItem(item)}
                 className={`cursor-pointer min-h-[80px] p-[24px] rounded flex items-center justify-between transition-colors ${
                   selectedItems.includes(item)
-                    ? 'bg-[#111] text-[#B5FF4D]'
-                    : 'bg-[#1a1a1a] text-gray-500'
+                    ? 'bg-[#141414] text-[#B5FF4D]'
+                    : 'bg-[#141414] text-gray-500'
                 }`}
               >
-                <span>{item}</span>
-                <span className="text-xl">
-                  {selectedItems.includes(item) ? '✔' : ''}
+                <span className='text-base font-normal text-[#9D9D95]'>{item}</span>
+                <span className="  bg-[#141414] ">
+                  <div className='w-[32px] h-[32px] flex justify-center items-center rounded-[4px] '>
+                  {selectedItems.includes(item) ? <Image src={checkmark} alt='not-found'/> : ''}
+                  </div>
                 </span>
               </div>
 
               {item === 'Finding Active Slates' && expandedItem === item && (
-                <div className="mt-2 ml-4 bg-[#101010] rounded-md p-3 space-y-2">
+                <div className="mt-2 bg-[#101010] rounded-md p-[24px] space-y-[12px] dotted-bg">
+                  <div className='bg-[#1F1F1F] p-[12px]'>
                   <div className="flex items-center justify-between">
                     <p className="text-white text-sm font-medium">Loading Leagues</p>
-                    <div className="relative group ml-2">
-                      <p className="text-xs text-blue-400 underline cursor-pointer">
-                        Michael Chiang
-                      </p>
-                      <div className="absolute left-0 mt-2 hidden group-hover:block z-50 bg-[#2a2a2a] text-white text-xs p-3 rounded-md shadow-lg w-72">
-                        <p className="font-semibold">
-                          Michael Chiang{' '}
-                          <span className="text-gray-400 font-normal">9 hr. ago</span>
-                        </p>
-                        <p className="mt-1 text-gray-300 leading-snug">
-                          Until the sync gets to this section it should just be 'Loading
-                          Leagues' with no sub divs like the others
-                        </p>
-                      </div>
-                    </div>
                   </div>
-
                   {leagues.map((league) => (
                     <div
                       key={league.name}
-                      className="flex justify-between items-center border-b border-gray-700 py-2"
+                      className="flex justify-between items-center border-b border-[#404040] py-2"
                     >
                       <div>
                         <p
@@ -137,6 +128,7 @@ export default function OtpModal({ platformName, onClose }) {
                       ) : null}
                     </div>
                   ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -180,8 +172,8 @@ export default function OtpModal({ platformName, onClose }) {
   
 
 return (
-  <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-    <div className="w-full max-w-[480px] bg-[#111111] text-white p-[32px] rounded-[6px] relative">
+  <div className="fixed inset-0 z-50 overlay-box flex items-center justify-center p-4">
+    <div className="w-full max-w-[480px] bg-[#030303] text-white p-[32px] rounded-[6px] relative">
 
       {/* Close button */}
       <div className="flex justify-between items-center mb-[32px]">
