@@ -25,14 +25,33 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+
 @font-face {
     font-family: 'tactic_sansmedium_italic';
-    src: url('/public/assets/tacticsans-medit.woff') format('woff2'),
-         url('/public/assets/tacticsans-medit.woff') format('woff');
+    src: url('../assets/images/tacticsans-med.woff') format('woff2'),
+         url('../assets/images/tacticsans-med.woff2') format('woff');
     font-weight: normal;
     font-style: normal;
 
 }
-h1 {
+@font-face {
+    font-family: 'volksans_testregular';
+    src: url('../assets/images/volksanstest-regular-bf63eee6e3c8d0e.woff2') format('woff2'),
+         url('../assets/images/volksanstest-regular-bf63eee6e3c8d0e.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+.head-1 {
    font-family: 'tactic_sansmedium_italic';
+}
+.connect-bg {
+  background-image: url(../assets/images/connect-bg.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: right top;
+}
+.font-secondry {
+  font-family: 'volksans_testregular';
+  font-weight: normal;
 }

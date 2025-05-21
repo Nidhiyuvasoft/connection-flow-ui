@@ -6,19 +6,21 @@ export default function SignInModal({ platformName, onClose, onSuccess }) {
   const [password, setPassword] = useState('');
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-      <div className="relative bg-[#111] p-6 rounded-xl w-full max-w-md text-white">
+    <div className="fixed inset-0 bg-opacity-70 flex items-center justify-center z-50">
+      <div className="relative bg-[#111111] p-[32px] rounded-[6px] w-full max-w-[480px] text-white">
+        <div className="flex justify-between items-center mb-[32px]">
+          <h2 className="text-xl font-bold mb-0 text-center font-secondry">
+          Connecting {platformName}
+        </h2>
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"
+          className=" text-gray-400 hover:text-white text-2xl"
           aria-label="Close"
         >
           <IoClose />
         </button>
-
-        <h2 className="text-xl font-bold mb-4 text-center">
-          Connecting {platformName}
-        </h2>
+        
+        </div>
         {/* <input
           type="text"
           placeholder="Email address"

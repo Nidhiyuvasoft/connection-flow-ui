@@ -44,10 +44,10 @@ export default function ConnectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="min-h-screen bg-[#030303] text-white flex items-center justify-center connect-bg">
       {!showModal && (
-        <div className="w-full  p-6 max-w-[380px]">
-          <h1 className="text-3xl font-bold text-center mb-2 text-[#FFFFF6]">
+        <div className="w-full  max-w-[380px] mt-4">
+          <h1 className=" head-1 text-3xl text-center mb-2 text-[#FFFFF6]">
             Select platforms to connect to Stacked
           </h1>
           <p className="text-base text-center text-[#9D9D95] mb-6 font-normal">
@@ -68,7 +68,7 @@ export default function ConnectPage() {
           <button
             onClick={handleContinue}
             disabled={selected.length === 0}
-            className={`w-full mt-6 py-3 font-regular text-[#030303] text-base bg-lime-400 rounded-sm transition ${
+            className={`w-full mt-[40px] py-3 font-regular text-[#030303] text-base bg-lime-400 rounded-sm transition ${
               selected.length === 0
                 ? 'bg-gray-700 cursor-not-allowed'
                 : 'bg-lime-400 text-[#030303] hover:bg-lime-500'

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { IoClose } from "react-icons/io5"; // <-- Import the close icon
+import {underdog} from "@/assets/images/underdog.png"
 
 export default function OtpModal({ platformName, onClose }) {
   const inputRefs = useRef([]);
@@ -67,16 +68,17 @@ export default function OtpModal({ platformName, onClose }) {
   if (isVerifying) {
     return (
       <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-[#1b1b1b] text-white p-6 rounded-xl relative space-y-4">
-          <h2 className="text-lg font-semibold">Downloading data</h2>
+        <div className="w-full max-w-[480px] bg-[#1b1b1b] text-white p-[32px] rounded-[6px] relative space-y-4">
+          <img src={underdog} alt='underdog' />
+          <h2 className="text-lg font-semibold mb-[32px]">Downloading data</h2>
 
           {checklistItems.map((item, index) => (
             <div key={index}>
               <div
                 onClick={() => toggleItem(item)}
-                className={`cursor-pointer p-3 rounded flex items-center justify-between transition-colors ${
+                className={`cursor-pointer min-h-[80px] p-[24px] rounded flex items-center justify-between transition-colors ${
                   selectedItems.includes(item)
-                    ? 'bg-[#111] text-green-500'
+                    ? 'bg-[#111] text-[#B5FF4D]'
                     : 'bg-[#1a1a1a] text-gray-500'
                 }`}
               >
@@ -179,21 +181,24 @@ export default function OtpModal({ platformName, onClose }) {
 
 return (
   <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-    <div className="w-full max-w-md bg-[#1b1b1b] text-white p-6 rounded-xl relative">
+    <div className="w-full max-w-[480px] bg-[#111111] text-white p-[32px] rounded-[6px] relative">
 
       {/* Close button */}
+      <div className="flex justify-between items-center mb-[32px]">
+         <h2 className="text-xl font-bold mb-0 text-center font-secondry text-[#FFFFF6]">
+        Connecting {platformName}
+      </h2>
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"
+        className=" text-gray-400 hover:text-white text-2xl"
         aria-label="Close"
       >
         <IoClose />
       </button>
 
-      <h2 className="text-xl font-semibold mb-2 flex items-center">
-        Connecting {platformName}
-      </h2>
-      <p className="mb-4 text-gray-400 text-sm">
+     
+      </div>
+      <p className="mb-[16px] text-[#9D9D95] text-base font-normal">
         Enter a 6-digit code sent to email@address.com
       </p>
 
@@ -206,7 +211,7 @@ return (
             maxLength={1}
             inputMode="numeric"
             pattern="[0-9]*"
-            className="w-10 h-12 text-center text-xl rounded bg-black border border-gray-600 focus:outline-none"
+            className="w-[62px] h-20 text-center text-[40px] rounded bg-white/10  focus:outline-none"
             value={digit}
             onChange={(e) => handleChange(e, i)}
             onKeyDown={(e) => handleKeyDown(e, i)}
