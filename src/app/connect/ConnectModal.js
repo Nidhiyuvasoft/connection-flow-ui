@@ -4,6 +4,34 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useEffect, useRef, useState } from "react";
 
+const connectModalData = {
+  "emailPlaceholder": "Email address",
+  "passwordPlaceholder": "Password",
+  "signInButton": "Sign in",
+  "emailIcon": "/assets/email-icon.svg",
+  "lockIcon": "/assets/lock-icon.svg",
+  "otpPrompt": "Enter a 6-digit code sent to email@address.com",
+  "downloadHeader": "Downloading data",
+  "checklistItems": [
+    "Connecting to platform",
+    "Finding Active Slates",
+    "Downloading Drafts",
+    "Calculating Exposures / Data"
+  ],
+  "leagues": [
+    { "name": "League Delta" },
+    { "name": "League Alpha" },
+    { "name": "League Gamma" },
+    { "name": "League Beta" }
+  ],
+  "validationMessages": {
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email",
+    "passwordRequired": "Password is required"
+  }
+}
+
+
 export default function ConnectModal({
   stage,
   platformName,
@@ -19,20 +47,11 @@ export default function ConnectModal({
   const [showLeagueInfo, setShowLeagueInfo] = useState(false);
   const [leagueStatusList, setLeagueStatusList] = useState([]);
   const [currentLeagueIndex, setCurrentLeagueIndex] = useState(0);
+  const [currentItemIndex, setCurrentItemIndex] = useState(0);
+  const [itemStatuses, setItemStatuses] = useState({});
 
-  const checklistItems = [
-    'Connecting to platform',
-    'Finding Active Slates',
-    'Downloading Drafts',
-    'Calculating Exposures / Data',
-  ];
-
-  const defaultLeagues = [
-    { name: 'League Delta' },
-    { name: 'League Alpha' },
-    { name: 'League Gamma' },
-    { name: 'League Beta' },
-  ];
+  const checklistItems = connectModalData.checklistItems;
+  const defaultLeagues = connectModalData.leagues;
 
   const handleOtpChange = (e, index) => {
     const value = e.target.value;
@@ -40,7 +59,6 @@ export default function ConnectModal({
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-
       if (index < 5) {
         inputRefs.current[index + 1]?.focus();
       } else {
@@ -76,6 +94,31 @@ export default function ConnectModal({
   };
 
   useEffect(() => {
+    if (isVerifying && currentItemIndex < checklistItems.length) {
+      setItemStatuses(prev => ({
+        ...prev,
+        [checklistItems[currentItemIndex]]: 'loading'
+      }));
+
+      const timer = setTimeout(() => {
+        setItemStatuses(prev => ({
+          ...prev,
+          [checklistItems[currentItemIndex]]: 'done'
+        }));
+        setSelectedItems(prev => [...prev, checklistItems[currentItemIndex]]);
+        setCurrentItemIndex(prev => prev + 1);
+
+        if (checklistItems[currentItemIndex] === 'Finding Active Slates') {
+          setExpandedItem('Finding Active Slates');
+          setShowLeagueInfo(true);
+        }
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isVerifying, currentItemIndex, checklistItems]);
+
+  useEffect(() => {
     if (!showLeagueInfo || currentLeagueIndex >= defaultLeagues.length) return;
 
     const timer = setTimeout(() => {
@@ -92,8 +135,11 @@ export default function ConnectModal({
   const renderSignInForm = () => {
     const initialValues = { email: '', password: '' };
     const validationSchema = Yup.object({
-      email: Yup.string().email('Invalid email').required('Email is required'),
-      password: Yup.string().required('Password is required'),
+      email: Yup.string()
+        .email(connectModalData.validationMessages.emailInvalid)
+        .required(connectModalData.validationMessages.emailRequired),
+      password: Yup.string()
+        .required(connectModalData.validationMessages.passwordRequired),
     });
 
     const handleSubmit = (values, { setSubmitting }) => {
@@ -105,37 +151,42 @@ export default function ConnectModal({
     return (
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
         <Form>
-          <div className="mb-6 relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-              <img src="/assets/email-icon.svg" alt="email-icon" />
+          <div className="space-y-4 flex flex-col gap-4">
+
+            <div className="mb-6 relative">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img src={connectModalData.emailIcon} alt="email-icon" />
+              </div>
+              <Field
+                name="email"
+                type="email"
+                placeholder={connectModalData.emailPlaceholder}
+                className="bg-white/10 text-[#9D9D95] text-base font-normal rounded-sm block w-full ps-10 p-2.5"
+              />
+              <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1 absolute top-full left-0" />
             </div>
-            <Field
-              name="email"
-              type="email"
-              placeholder="Email address"
-              className="bg-white/10 text-[#9D9D95] text-base font-normal rounded-sm block w-full ps-10 p-2.5"
-            />
-            <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
+
+            <div className="mb-6 relative">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img src={connectModalData.lockIcon} alt="lock-icon" />
+              </div>
+              <Field
+                name="password"
+                type="password"
+                placeholder={connectModalData.passwordPlaceholder}
+                className="bg-white/10 text-[#9D9D95] text-base font-normal rounded-sm block w-full ps-10 p-2.5"
+              />
+              <ErrorMessage name="password" component="div" className="text-red-500 text-sm mt-1 absolute top-full left-0" />
+            </div>
+
+            <button type="submit" className="w-full bg-lime-400 text-black py-2 rounded-sm hover:bg-lime-500">
+              {connectModalData.signInButton}
+            </button>
           </div>
 
-          <div className="mb-6 relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-              <img src="/assets/lock-icon.svg" alt="lock-icon" />
-            </div>
-            <Field
-              name="password"
-              type="password"
-              placeholder="Password"
-              className="bg-white/10 text-[#9D9D95] text-base font-normal rounded-sm block w-full ps-10 p-2.5"
-            />
-            <ErrorMessage name="password" component="div" className="text-red-500 text-sm mt-1" />
-          </div>
-
-          <button type="submit" className="w-full bg-lime-400 text-black py-2 rounded-sm hover:bg-lime-500">
-            Sign in
-          </button>
         </Form>
       </Formik>
+      
     );
   };
 
@@ -145,54 +196,72 @@ export default function ConnectModal({
         <div className="space-y-4">
           <h2 className="text-xl font-semibold flex items-center space-x-2">
             {platformLogo && <img src={platformLogo} className="w-6 h-6" />}
-            <span>Downloading data</span>
+            <span>{connectModalData.downloadHeader}</span>
           </h2>
 
-          {checklistItems.map((item, idx) => (
-            <div key={idx}>
-              <div
-                className={`cursor-pointer p-3 rounded flex items-center justify-between transition-colors ${
-                  selectedItems.includes(item)
-                    ? 'bg-[#111] text-green-500'
-                    : 'bg-[#1a1a1a] text-gray-500'
-                }`}
-                onClick={() => toggleItem(item)}
-              >
-                <span>{item}</span>
-                <span>{selectedItems.includes(item) ? '✔' : ''}</span>
-              </div>
+          {checklistItems.map((item, idx) => {
+            const status = itemStatuses[item] || 'pending';
+            const isSelected = selectedItems.includes(item);
 
-              {item === 'Finding Active Slates' && expandedItem === item && showLeagueInfo && (
-                <div className="mt-2 ml-4 bg-[#101010] rounded-md p-3 space-y-2">
-                  {defaultLeagues.map((league, index) => {
-                    const isLoaded = leagueStatusList.some((l) => l.name === league.name);
-                    const isCurrent = index === currentLeagueIndex;
-
-                    return (
-                      <div
-                        key={league.name}
-                        className="flex justify-between items-center border-b border-gray-700 py-2"
-                      >
-                        <p className={`text-sm ${isLoaded ? 'text-green-400' : 'text-white'}`}>{league.name}</p>
-                        {isLoaded ? (
-                          <span className="text-green-400 text-sm">✔</span>
-                        ) : isCurrent ? (
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : null}
-                      </div>
-                    );
-                  })}
+            return (
+              <div key={idx}>
+                <div
+                  className={`p-3 rounded flex items-center justify-between transition-colors ${
+                    status === 'done' || isSelected
+                      ? 'bg-[#111] text-green-500'
+                      : status === 'loading'
+                      ? 'bg-[#1a1a1a] text-yellow-500'
+                      : 'bg-[#1a1a1a] text-gray-500'
+                  }`}
+                >
+                  <span>{item}</span>
+                  <span>
+                    {status === 'done' || isSelected ? (
+                      '✔'
+                    ) : status === 'loading' ? (
+                      <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+                    ) : null}
+                  </span>
                 </div>
-              )}
-            </div>
-          ))}
+
+                {item === 'Finding Active Slates' && expandedItem === item && showLeagueInfo && (
+                  <div className="mt-2 ml-4 bg-[#101010] rounded-md p-3 space-y-2">
+                    {defaultLeagues.map((league, index) => {
+                      const isLoaded = leagueStatusList.some((l) => l.name === league.name);
+                      const isCurrent = index === currentLeagueIndex;
+
+                      return (
+                        <div
+                          key={league.name}
+                          className="flex justify-between items-center border-b border-gray-700 py-2"
+                        >
+                          <p className={`text-sm ${isLoaded ? 'text-green-400' : 'text-white'}`}>
+                            {league.name}
+                          </p>
+                          {isLoaded ? (
+                            <span className="text-green-400 text-sm">✔</span>
+                          ) : isCurrent ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       );
     }
 
     return (
       <>
-        <p className="mb-4 text-gray-400 text-sm">Enter a 6-digit code sent to email@address.com</p>
+        <div className="flex items-center justify-center mb-6 space-x-2">
+          {platformLogo && <img src={platformLogo} className="w-6 h-6" />}
+          <h2 className="text-xl font-bold">Connecting {platformName}</h2>
+        </div>
+        <p className="mb-4 text-gray-400 text-sm">{connectModalData.otpPrompt}</p>
         <div className="flex justify-between gap-2">
           {otp.map((digit, i) => (
             <input
@@ -217,11 +286,11 @@ export default function ConnectModal({
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">
           <IoClose />
         </button>
-
-        <div className="flex items-center justify-center mb-6 space-x-2">
-          {platformLogo && <img src={platformLogo} className="w-6 h-6" />}
-          <h2 className="text-xl font-bold">Connecting {platformName}</h2>
-        </div>
+        {stage === 'signin' &&
+          <div className="flex items-center justify-center mb-6 space-x-2">
+            {platformLogo && <img src={platformLogo} className="w-6 h-6" />}
+            <h2 className="text-xl font-bold">Connecting {platformName}</h2>
+          </div>}
 
         {stage === 'signin' ? renderSignInForm() : renderOtpStage()}
       </div>
